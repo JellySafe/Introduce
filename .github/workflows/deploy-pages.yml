@@ -1,0 +1,66 @@
+name: GitHub Pages 배포
+
+# main 에 푸시하면 정적 내보내기를 만들어 Pages 에 올린다.
+# 서버 런타임이 없는 사이트라 빌드 산출물(out/)을 그대로 서빙한다.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# deploy-pages 가 요구하는 최소 권한
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 배포는 겹치면 안 된다. 진행 중인 배포는 끝까지 두고 대기시킨다.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: 빌드
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pages 설정 읽기
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: 타입 검사
+        run: pnpm typecheck
+
+      - name: 정적 내보내기
+        run: pnpm build
+        env:
+          # 프로젝트 사이트는 /<저장소명>/ 아래에서 서빙된다.
+          # 이 값이 없으면 /_next/... 가 전부 404 난다.
+          NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+
+      - name: 산출물 업로드
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    name: 배포
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

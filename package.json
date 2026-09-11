@@ -1,0 +1,29 @@
+{
+  "name": "@jellysafe/landing",
+  "version": "0.1.0",
+  "private": true,
+  "description": "JellySafe 소개 사이트 — 제주 해파리 안전 서비스",
+  "scripts": {
+    "dev": "next dev --port 3110",
+    "build": "next build",
+    "start": "npx --yes serve out -l 3110",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "16.2.10",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/three": "^0.180.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.10",
+    "typescript": "^5"
+  },
+  "packageManager": "pnpm@10.17.1"
+}
